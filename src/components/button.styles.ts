@@ -3,14 +3,14 @@ import styled, { css } from 'styled-components'
 export type ButtonVariants = 'primary' | 'secondary' | 'danger' | 'success'
 
 interface ButtonContainerProps {
-  variant: ButtonVariants
+	variant: ButtonVariants
 }
 
 const buttonVariants = {
-  primary: 'purple',
-  secondary: 'gray',
-  danger: 'red',
-  success: 'green',
+	primary: 'purple',
+	secondary: 'gray',
+	danger: 'red',
+	success: 'green',
 }
 
 export const ButtonContainer = styled.button<ButtonContainerProps>`
@@ -25,8 +25,8 @@ export const ButtonContainer = styled.button<ButtonContainerProps>`
   font-weight: bold;
 
   /* ${(props) => {
-    return css`
+		return css`
       background: ${buttonVariants[props.variant]}
     `
-  }} */
+	}} */
 `
