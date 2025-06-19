@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled, { useTheme } from 'styled-components'
 
 export const HistoryContainer = styled.main`
   flex: 1;
@@ -58,5 +58,31 @@ export const HistoryList = styled.div`
         padding-right: 1.5rem;
       }
     }
+  }
+`
+
+type ValidStatusColor = 'green' | 'red' | 'yellow'
+
+interface StatusProps {
+	color: ValidStatusColor
+}
+
+function getThemeColor(color: ValidStatusColor) {
+	const theme = useTheme()
+
+	return theme[color][500]
+}
+
+export const Status = styled.span<StatusProps>`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &::before {
+    content: '';
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 100%;
+    background: ${(props) => getThemeColor(props.color)};
   }
 `
