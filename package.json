@@ -11,12 +11,14 @@
 		"lint:fix": "biome check src --write"
 	},
 	"dependencies": {
+		"@hookform/resolvers": "^5.1.1",
 		"phosphor-react": "^1.4.1",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
 		"react-hook-form": "^7.58.1",
 		"react-router-dom": "^7.6.1",
-		"styled-components": "^6.1.17"
+		"styled-components": "^6.1.17",
+		"zod": "^3.25.67"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
