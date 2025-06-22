@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Play } from 'phosphor-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -29,31 +29,17 @@ interface Cycle {
 	id: string
 	task: string
 	minutesAmount: number
+	startDate: Date
 }
 
 export function Home() {
 	const [cycles, setCycles] = useState<Cycle[]>([])
 	const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
-	const [amountSecondsPassed, setAmountSecondsPassed] = useState(0)
+	const [amountSecondsElapsed, setAmountSecondsElapsed] = useState(0)
 
 	const { register, handleSubmit, watch, reset } = useForm({
 		resolver: zodResolver(newCycleFormValidationSchema),
 	})
-
-	function handleCreateNewCycle(data: NewCycleFormData) {
-		const newCycleId = String(Date.now())
-
-		const newCycle = {
-			id: newCycleId,
-			task: data.task,
-			minutesAmount: data.minutesAmount,
-		} satisfies Cycle
-
-		setCycles((state) => [...state, newCycle])
-		setActiveCycleId(newCycleId)
-
-		reset()
-	}
 
 	const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
 
@@ -62,7 +48,7 @@ export function Home() {
 		: 0
 
 	const currentSeconds = activeCycle
-		? minutesAmountInSeconds - amountSecondsPassed
+		? minutesAmountInSeconds - amountSecondsElapsed
 		: 0
 
 	const minutesAmount = Math.trunc(currentSeconds / 60)
@@ -78,6 +64,40 @@ export function Home() {
 
 	const task = watch('task')
 	const isSubmitDisabled = !task
+
+	useEffect(() => {
+		let countdownInterval: number
+
+		if (activeCycle) {
+			countdownInterval = setInterval(() => {
+				const timeElapsedInSeconds = Math.trunc(
+					(Date.now() - activeCycle.startDate.getTime()) / 1000,
+				)
+
+				setAmountSecondsElapsed(timeElapsedInSeconds)
+			}, 1000)
+		}
+
+		return () => {
+			clearInterval(countdownInterval)
+		}
+	}, [activeCycle])
+
+	function handleCreateNewCycle(data: NewCycleFormData) {
+		const newCycleId = String(Date.now())
+
+		const newCycle = {
+			id: newCycleId,
+			task: data.task,
+			minutesAmount: data.minutesAmount,
+			startDate: new Date(),
+		} satisfies Cycle
+
+		setCycles((state) => [...state, newCycle])
+		setActiveCycleId(newCycleId)
+
+		reset()
+	}
 
 	return (
 		<HomeContainer>
