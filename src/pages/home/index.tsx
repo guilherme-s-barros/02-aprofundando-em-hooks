@@ -54,13 +54,8 @@ export function Home() {
 	const minutesAmount = Math.trunc(currentSeconds / 60)
 	const secondsAmount = currentSeconds % 60
 
-	const [firstDigitOfMinutes, secondDigitOfMinutes] = minutesAmount
-		.toString()
-		.padStart(2, '0')
-
-	const [firstDigitOfSeconds, secondDigitOfSeconds] = secondsAmount
-		.toString()
-		.padStart(2, '0')
+	const minutes = minutesAmount.toString().padStart(2, '0')
+	const seconds = secondsAmount.toString().padStart(2, '0')
 
 	const task = watch('task')
 	const isSubmitDisabled = !task
@@ -83,6 +78,10 @@ export function Home() {
 		}
 	}, [activeCycle])
 
+	useEffect(() => {
+		document.title = activeCycle ? `${minutes}:${seconds}` : 'Ignite Timer'
+	}, [activeCycle, minutes, seconds])
+
 	function handleCreateNewCycle(data: NewCycleFormData) {
 		const newCycleId = String(Date.now())
 
@@ -93,6 +92,7 @@ export function Home() {
 			startDate: new Date(),
 		} satisfies Cycle
 
+		setAmountSecondsElapsed(0)
 		setCycles((state) => [...state, newCycle])
 		setActiveCycleId(newCycleId)
 
@@ -136,11 +136,11 @@ export function Home() {
 				</FormInputs>
 
 				<CountdownContainer>
-					<span>{firstDigitOfMinutes}</span>
-					<span>{secondDigitOfMinutes}</span>
+					<span>{minutes.at(0)}</span>
+					<span>{minutes.at(1)}</span>
 					<Separator>:</Separator>
-					<span>{firstDigitOfSeconds}</span>
-					<span>{secondDigitOfSeconds}</span>
+					<span>{seconds.at(0)}</span>
+					<span>{seconds.at(1)}</span>
 				</CountdownContainer>
 
 				<StartCountdownButton type="submit" disabled={isSubmitDisabled}>
