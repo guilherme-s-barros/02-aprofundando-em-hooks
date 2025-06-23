@@ -4,16 +4,14 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
+import { Countdown } from './components/countdown'
+import { NewCycleForm } from './components/new-cycle-form'
+
 import {
-	CountdownContainer,
-	FormContainer,
-	FormInputs,
+	Form,
 	HomeContainer,
-	MinutesAmountInput,
-	Separator,
 	StartCountdownButton,
 	StopCountdownButton,
-	TextInput,
 } from './styles'
 
 const newCycleFormValidationSchema = z.object({
@@ -138,49 +136,9 @@ export function Home() {
 
 	return (
 		<HomeContainer isCountdownRunning={!!activeCycle}>
-			<FormContainer onSubmit={handleSubmit(handleCreateNewCycle)}>
-				<FormInputs>
-					<label htmlFor="task">Vou trabalhar em</label>
-					<TextInput
-						type="text"
-						id="task"
-						placeholder="Dê um nome para o seu projeto"
-						list="taskSuggestions"
-						required
-						disabled={!!activeCycle}
-						{...register('task')}
-					/>
-
-					<datalist id="taskSuggestions">
-						<option value="Projeto 1" />
-						<option value="Projeto 2" />
-						<option value="Projeto 3" />
-						<option value="Projeto 4" />
-					</datalist>
-
-					<label htmlFor="minutesAmount">durante</label>
-					<MinutesAmountInput
-						type="number"
-						id="minutesAmount"
-						placeholder="00"
-						min={5}
-						max={60}
-						step={5}
-						required
-						disabled={!!activeCycle}
-						{...register('minutesAmount', { valueAsNumber: true })}
-					/>
-
-					<span>minutos.</span>
-				</FormInputs>
-
-				<CountdownContainer>
-					<span>{minutes.at(0)}</span>
-					<span>{minutes.at(1)}</span>
-					<Separator>:</Separator>
-					<span>{seconds.at(0)}</span>
-					<span>{seconds.at(1)}</span>
-				</CountdownContainer>
+			<Form onSubmit={handleSubmit(handleCreateNewCycle)}>
+				<NewCycleForm />
+				<Countdown />
 
 				{activeCycle ? (
 					<StopCountdownButton type="button" onClick={handleInterruptCycle}>
@@ -193,7 +151,7 @@ export function Home() {
 						Começar
 					</StartCountdownButton>
 				)}
-			</FormContainer>
+			</Form>
 		</HomeContainer>
 	)
 }
