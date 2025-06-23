@@ -32,6 +32,7 @@ interface Cycle {
 	minutesAmount: number
 	startDate: Date
 	interruptedDate?: Date
+	finishedDate?: Date
 }
 
 export function Home() {
@@ -71,14 +72,31 @@ export function Home() {
 					(Date.now() - activeCycle.startDate.getTime()) / 1000,
 				)
 
-				setAmountSecondsElapsed(timeElapsedInSeconds)
+				if (timeElapsedInSeconds >= minutesAmountInSeconds) {
+					setCycles((state) =>
+						state.map((cycle) => {
+							if (cycle.id === activeCycleId) {
+								return {
+									...cycle,
+									finishedDate: new Date(),
+								}
+							}
+
+							return cycle
+						}),
+					)
+
+					setActiveCycleId(null)
+				} else {
+					setAmountSecondsElapsed(timeElapsedInSeconds)
+				}
 			}, 1000)
 		}
 
 		return () => {
 			clearInterval(countdownInterval)
 		}
-	}, [activeCycle])
+	}, [activeCycle, activeCycleId, minutesAmountInSeconds])
 
 	useEffect(() => {
 		document.title = activeCycle ? `${minutes}:${seconds}` : 'Ignite Timer'
@@ -102,22 +120,21 @@ export function Home() {
 	}
 
 	function handleInterruptCycle() {
-		const updatedCycles = cycles.map((cycle) => {
-			if (cycle.id === activeCycleId) {
-				return {
-					...cycle,
-					interruptedDate: new Date(),
+		setCycles((state) =>
+			state.map((cycle) => {
+				if (cycle.id === activeCycleId) {
+					return {
+						...cycle,
+						interruptedDate: new Date(),
+					}
 				}
-			}
 
-			return cycle
-		})
+				return cycle
+			}),
+		)
 
-		setCycles(updatedCycles)
 		setActiveCycleId(null)
 	}
-
-	console.log(cycles)
 
 	return (
 		<HomeContainer isCountdownRunning={!!activeCycle}>
