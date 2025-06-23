@@ -1,7 +1,7 @@
 import styled, { css } from 'styled-components'
 
 interface HomeContainerProps {
-	isCountdownRunning: boolean
+	$isCountdownRunning: boolean
 }
 
 export const HomeContainer = styled.main<HomeContainerProps>`
@@ -27,7 +27,7 @@ export const HomeContainer = styled.main<HomeContainerProps>`
   }
 
   ${(props) =>
-		props.isCountdownRunning &&
+		props.$isCountdownRunning &&
 		css`
     &::after {
       visibility: visible;

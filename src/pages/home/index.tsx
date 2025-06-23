@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { HandPalm, Play } from 'phosphor-react'
-import { useEffect, useState } from 'react'
+import { createContext, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -33,10 +33,16 @@ interface Cycle {
 	finishedDate?: Date
 }
 
+interface CyclesContextData {
+	activeCycle?: Cycle
+	markCurrentCycleAsFinished(): void
+}
+
+export const CyclesContext = createContext({} as CyclesContextData)
+
 export function Home() {
 	const [cycles, setCycles] = useState<Cycle[]>([])
 	const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
-	const [amountSecondsElapsed, setAmountSecondsElapsed] = useState(0)
 
 	const { register, handleSubmit, watch, reset } = useForm({
 		resolver: zodResolver(newCycleFormValidationSchema),
@@ -44,78 +50,25 @@ export function Home() {
 
 	const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
 
-	const minutesAmountInSeconds = activeCycle
-		? activeCycle.minutesAmount * 60
-		: 0
-
-	const currentSeconds = activeCycle
-		? minutesAmountInSeconds - amountSecondsElapsed
-		: 0
-
-	const minutesAmount = Math.trunc(currentSeconds / 60)
-	const secondsAmount = currentSeconds % 60
-
-	const minutes = minutesAmount.toString().padStart(2, '0')
-	const seconds = secondsAmount.toString().padStart(2, '0')
-
 	const task = watch('task')
 	const isSubmitDisabled = !task
 
-	useEffect(() => {
-		let countdownInterval: number
+	// function handleCreateNewCycle(data: NewCycleFormData) {
+	// 	const newCycleId = String(Date.now())
 
-		if (activeCycle) {
-			countdownInterval = setInterval(() => {
-				const timeElapsedInSeconds = Math.trunc(
-					(Date.now() - activeCycle.startDate.getTime()) / 1000,
-				)
+	// 	const newCycle = {
+	// 		id: newCycleId,
+	// 		task: data.task,
+	// 		minutesAmount: data.minutesAmount,
+	// 		startDate: new Date(),
+	// 	} satisfies Cycle
 
-				if (timeElapsedInSeconds >= minutesAmountInSeconds) {
-					setCycles((state) =>
-						state.map((cycle) => {
-							if (cycle.id === activeCycleId) {
-								return {
-									...cycle,
-									finishedDate: new Date(),
-								}
-							}
+	// 	setAmountSecondsElapsed(0)
+	// 	setCycles((state) => [...state, newCycle])
+	// 	setActiveCycleId(newCycleId)
 
-							return cycle
-						}),
-					)
-
-					setActiveCycleId(null)
-				} else {
-					setAmountSecondsElapsed(timeElapsedInSeconds)
-				}
-			}, 1000)
-		}
-
-		return () => {
-			clearInterval(countdownInterval)
-		}
-	}, [activeCycle, activeCycleId, minutesAmountInSeconds])
-
-	useEffect(() => {
-		document.title = activeCycle ? `${minutes}:${seconds}` : 'Ignite Timer'
-	}, [activeCycle, minutes, seconds])
-
-	function handleCreateNewCycle(data: NewCycleFormData) {
-		const newCycleId = String(Date.now())
-
-		const newCycle = {
-			id: newCycleId,
-			task: data.task,
-			minutesAmount: data.minutesAmount,
-			startDate: new Date(),
-		} satisfies Cycle
-
-		setAmountSecondsElapsed(0)
-		setCycles((state) => [...state, newCycle])
-		setActiveCycleId(newCycleId)
-
-		reset()
-	}
+	// 	reset()
+	// }
 
 	function handleInterruptCycle() {
 		setCycles((state) =>
@@ -134,11 +87,32 @@ export function Home() {
 		setActiveCycleId(null)
 	}
 
+	function markCurrentCycleAsFinished() {
+		setCycles((state) =>
+			state.map((cycle) => {
+				if (cycle.id === activeCycleId) {
+					return {
+						...cycle,
+						finishedDate: new Date(),
+					}
+				}
+
+				return cycle
+			}),
+		)
+
+		setActiveCycleId(null)
+	}
+
 	return (
-		<HomeContainer isCountdownRunning={!!activeCycle}>
-			<Form onSubmit={handleSubmit(handleCreateNewCycle)}>
-				<NewCycleForm />
-				<Countdown />
+		<HomeContainer $isCountdownRunning={!!activeCycle}>
+			<Form /*onSubmit={handleSubmit(handleCreateNewCycle)}*/>
+				<CyclesContext.Provider
+					value={{ activeCycle, markCurrentCycleAsFinished }}
+				>
+					{/* <NewCycleForm /> */}
+					<Countdown />
+				</CyclesContext.Provider>
 
 				{activeCycle ? (
 					<StopCountdownButton type="button" onClick={handleInterruptCycle}>
