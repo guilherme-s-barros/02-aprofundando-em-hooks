@@ -24,6 +24,13 @@ function CycleStatus({ cycle }: CycleStatusProps) {
 export function History() {
 	const { cycles } = useCyclesContext()
 
+	function timeBetweenCycleStartDateToNow(startDate: Date) {
+		return formatDistanceToNow(startDate, {
+			addSuffix: true,
+			locale: ptBR,
+		})
+	}
+
 	return (
 		<HistoryContainer>
 			<h1>Meu histórico</h1>
@@ -44,12 +51,7 @@ export function History() {
 								<tr key={cycle.id}>
 									<td>{cycle.task}</td>
 									<td>{cycle.minutesAmount} minutos</td>
-									<td>
-										{formatDistanceToNow(cycle.startDate, {
-											addSuffix: true,
-											locale: ptBR,
-										})}
-									</td>
+									<td>{timeBetweenCycleStartDateToNow(cycle.startDate)}</td>
 									<td>
 										<CycleStatus cycle={cycle} />
 									</td>
