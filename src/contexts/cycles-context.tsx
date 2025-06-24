@@ -1,6 +1,6 @@
 import { ReactNode, createContext, useContext, useState } from 'react'
 
-interface Cycle {
+export interface Cycle {
 	id: string
 	task: string
 	minutesAmount: number

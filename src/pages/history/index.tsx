@@ -1,6 +1,22 @@
-import { useCyclesContext } from '../../contexts/cycles-context'
+import { Cycle, useCyclesContext } from '../../contexts/cycles-context'
 
 import { HistoryContainer, HistoryList, Status } from './styles'
+
+interface CycleStatusProps {
+	cycle: Cycle
+}
+
+function CycleStatus({ cycle }: CycleStatusProps) {
+	if (cycle.finishedDate) {
+		return <Status color="green">Concluído</Status>
+	}
+
+	if (cycle.interruptedDate) {
+		return <Status color="red">Interrompido</Status>
+	}
+
+	return <Status color="yellow">Em andamento</Status>
+}
 
 export function History() {
 	const { cycles } = useCyclesContext()
@@ -8,8 +24,6 @@ export function History() {
 	return (
 		<HistoryContainer>
 			<h1>Meu histórico</h1>
-
-			<pre>{JSON.stringify(cycles, null, 2)}</pre>
 
 			<HistoryList>
 				<table>
@@ -22,46 +36,18 @@ export function History() {
 						</tr>
 					</thead>
 					<tbody>
-						<tr>
-							<td>Revisar código do projeto</td>
-							<td>24 minutos</td>
-							<td>Há cerca de 1 semana</td>
-							<td>
-								<Status color="green">Concluído</Status>
-							</td>
-						</tr>
-						<tr>
-							<td>Implementar autenticação</td>
-							<td>30 minutos</td>
-							<td>Há cerca de 2 dias</td>
-							<td>
-								<Status color="yellow">Em andamento</Status>
-							</td>
-						</tr>
-						<tr>
-							<td>Atualizar documentação</td>
-							<td>15 minutos</td>
-							<td>Há cerca de 3 horas</td>
-							<td>
-								<Status color="red">Interrompido</Status>
-							</td>
-						</tr>
-						<tr>
-							<td>Corrigir bugs no formulário</td>
-							<td>45 minutos</td>
-							<td>Há cerca de 5 dias</td>
-							<td>
-								<Status color="green">Concluído</Status>
-							</td>
-						</tr>
-						<tr>
-							<td>Refatorar componentes</td>
-							<td>10 minutos</td>
-							<td>Há cerca de 10 minutos</td>
-							<td>
-								<Status color="yellow">Em andamento</Status>
-							</td>
-						</tr>
+						{cycles.map((cycle) => {
+							return (
+								<tr key={cycle.id}>
+									<td>{cycle.task}</td>
+									<td>{cycle.minutesAmount} minutos</td>
+									<td>{cycle.startDate.toLocaleDateString()}</td>
+									<td>
+										<CycleStatus cycle={cycle} />
+									</td>
+								</tr>
+							)
+						})}
 					</tbody>
 				</table>
 			</HistoryList>
