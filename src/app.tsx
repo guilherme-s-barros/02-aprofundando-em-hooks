@@ -1,5 +1,6 @@
 import { ThemeProvider } from 'styled-components'
 
+import { CyclesContextProvider } from './contexts/cycles-context'
 import { Router } from './router'
 
 import { GlobalStyle } from './styles/global'
@@ -9,7 +10,10 @@ export function App() {
 	return (
 		<ThemeProvider theme={defaultTheme}>
 			<GlobalStyle />
-			<Router />
+
+			<CyclesContextProvider>
+				<Router />
+			</CyclesContextProvider>
 		</ThemeProvider>
 	)
 }
