@@ -22,6 +22,8 @@ const newCycleFormValidationSchema = z.object({
 		.max(60, 'O ciclo precisa ser de no máximo 60 minutos.'),
 })
 
+type NewCycleFormData = z.infer<typeof newCycleFormValidationSchema>
+
 export function Home() {
 	const { activeCycle, createNewCycle, interruptCurrentCycle } =
 		useCyclesContext()
@@ -30,14 +32,19 @@ export function Home() {
 		resolver: zodResolver(newCycleFormValidationSchema),
 	})
 
-	const { handleSubmit, watch } = newCycleForm
+	const { handleSubmit, watch, reset } = newCycleForm
 
 	const task = watch('task')
 	const isSubmitDisabled = !task
 
+	function handleCreateNewCycle(data: NewCycleFormData) {
+		createNewCycle(data)
+		reset()
+	}
+
 	return (
 		<HomeContainer $isCountdownRunning={!!activeCycle}>
-			<Form onSubmit={handleSubmit(createNewCycle)}>
+			<Form onSubmit={handleSubmit(handleCreateNewCycle)}>
 				<FormProvider {...newCycleForm}>
 					<NewCycleForm />
 				</FormProvider>
