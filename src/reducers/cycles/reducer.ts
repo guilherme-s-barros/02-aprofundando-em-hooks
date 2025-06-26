@@ -1,3 +1,5 @@
+import { produce } from 'immer'
+
 export interface Cycle {
 	id: string
 	task: string
@@ -37,49 +39,40 @@ export const initialCyclesState: CyclesState = {
 export function cyclesReducer(state: CyclesState, action: Action): CyclesState {
 	switch (action.type) {
 		case 'ADD_NEW_CYCLE': {
-			return {
-				...state,
-				cycles: [...state.cycles, action.payload.newCycle],
-				activeCycleId: action.payload.newCycle.id,
-			}
+			return produce(state, (draft) => {
+				draft.cycles.push(action.payload.newCycle)
+				draft.activeCycleId = action.payload.newCycle.id
+			})
 		}
 
 		case 'INTERRUPT_CURRENT_CYCLE': {
-			const cyclesWithInterruptedCycle = state.cycles.map((cycle) => {
-				if (cycle.id === state.activeCycleId) {
-					return {
-						...cycle,
-						interruptedDate: new Date(),
-					}
+			return produce(state, (draft) => {
+				const cycle = draft.cycles.find(
+					(cycle) => cycle.id === state.activeCycleId,
+				)
+
+				if (!cycle) {
+					return state
 				}
 
-				return cycle
+				cycle.interruptedDate = new Date()
+				draft.activeCycleId = null
 			})
-
-			return {
-				...state,
-				cycles: cyclesWithInterruptedCycle,
-				activeCycleId: null,
-			}
 		}
 
 		case 'MARK_CURRENT_CYCLE_AS_FINISHED': {
-			const cyclesWithFinishedCycle = state.cycles.map((cycle) => {
-				if (cycle.id === state.activeCycleId) {
-					return {
-						...cycle,
-						finishedDate: new Date(),
-					}
+			return produce(state, (draft) => {
+				const cycle = draft.cycles.find(
+					(cycle) => cycle.id === state.activeCycleId,
+				)
+
+				if (!cycle) {
+					return state
 				}
 
-				return cycle
+				cycle.finishedDate = new Date()
+				draft.activeCycleId = null
 			})
-
-			return {
-				...state,
-				cycles: cyclesWithFinishedCycle,
-				activeCycleId: null,
-			}
 		}
 
 		default: {
