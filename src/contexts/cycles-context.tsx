@@ -2,6 +2,7 @@ import {
 	ReactNode,
 	createContext,
 	useContext,
+	useEffect,
 	useReducer,
 	useState,
 } from 'react'
@@ -40,12 +41,42 @@ const CyclesContext = createContext({} as CyclesContextData)
 export function CyclesContextProvider({
 	children,
 }: CyclesContextProviderProps) {
-	const [cyclesState, dispatch] = useReducer(cyclesReducer, initialCyclesState)
-	const [amountSecondsElapsed, setAmountSecondsElapsed] = useState(0)
+	const [cyclesState, dispatch] = useReducer(
+		cyclesReducer,
+		initialCyclesState,
+		(initialState) => {
+			const storedStateAsJSON = localStorage.getItem(
+				'@ignite-timer:cycles-state-1.0.0',
+			)
+
+			if (storedStateAsJSON) {
+				return JSON.parse(storedStateAsJSON)
+			}
+
+			return initialState
+		},
+	)
 
 	const { cycles, activeCycleId } = cyclesState
-
 	const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
+
+	const [amountSecondsElapsed, setAmountSecondsElapsed] = useState(() => {
+		if (activeCycle) {
+			const timeElapsedInSeconds = Math.trunc(
+				(Date.now() - new Date(activeCycle.startDate).getTime()) / 1000,
+			)
+
+			return timeElapsedInSeconds
+		}
+
+		return 0
+	})
+
+	useEffect(() => {
+		const stateJSON = JSON.stringify(cyclesState)
+
+		localStorage.setItem('@ignite-timer:cycles-state-1.0.0', stateJSON)
+	}, [cyclesState])
 
 	function setSecondsElapsed(seconds: number) {
 		setAmountSecondsElapsed(seconds)

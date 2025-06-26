@@ -32,7 +32,7 @@ export function Countdown() {
 		if (activeCycle) {
 			countdownInterval = setInterval(() => {
 				const timeElapsedInSeconds = Math.trunc(
-					(Date.now() - activeCycle.startDate.getTime()) / 1000,
+					(Date.now() - new Date(activeCycle.startDate).getTime()) / 1000,
 				)
 
 				if (timeElapsedInSeconds >= minutesAmountInSeconds) {
