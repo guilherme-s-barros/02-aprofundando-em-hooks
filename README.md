@@ -6,6 +6,10 @@ Gerenciador de tarefas com controle de tempo, desenvolvido durante o curso Ignit
 
 O **Ignite Timer** é uma aplicação que permite ao usuário cadastrar tarefas com tempo estimado de execução e acompanhar seu histórico de produtividade. Ideal para quem utiliza a técnica Pomodoro ou busca uma forma simples de organizar o foco ao longo do dia.
 
+### 📸 Demonstração
+
+![Ignite Timer - Preview](./.github/preview.gif)
+
 ## ✨ Funcionalidades
 
 - Criação de novas tarefas com tempo definido (em minutos);
@@ -30,7 +34,3 @@ O **Ignite Timer** é uma aplicação que permite ao usuário cadastrar tarefas 
 - [Date-fns](https://date-fns.org/)
 - [Phosphor React Icons](https://phosphoricons.com/)
 - React Hooks: `useReducer`, `useContext`, `useEffect`, `useState`
-
-## 📸 Demonstração
-
-![Ignite Timer - Preview](./.github/preview.gif)
